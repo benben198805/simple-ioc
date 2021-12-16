@@ -22,9 +22,9 @@ public class Container<T> {
 
     public void bind(Class<T> clazz, T component) {
         if (existClasses.containsKey(clazz)) {
-            List<ComponentConfig> providerConfigs = existClasses.get(clazz);
-            providerConfigs.add(getComponentConfig(clazz, component));
-            existClasses.put(clazz, providerConfigs);
+            List<ComponentConfig> componentConfigs = existClasses.get(clazz);
+            componentConfigs.add(getComponentConfig(clazz, component));
+            existClasses.put(clazz, componentConfigs);
         } else {
             existClasses.put(clazz, new ArrayList<>() {{
                 add(getComponentConfig(clazz, component));
