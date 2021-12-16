@@ -3,8 +3,10 @@ package simple.ioc;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Qualifier;
 import javax.inject.Scope;
 import javax.inject.Singleton;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Container<T> {
@@ -32,11 +35,18 @@ public class Container<T> {
     }
 
     private ComponentConfig getComponentConfig(Class<T> clazz, T component) {
+        String namedValue = null;
+        String qualifierValue = null;
+
         if (existNamedAnnotation(clazz, component)) {
-            return new ComponentConfig(processProvider(clazz, component), getNamedValue(component));
-        } else {
-            return new ComponentConfig(processProvider(clazz, component), null);
+            namedValue = getNamedValue(component);
         }
+
+        if (existQualifierValue(clazz, component)) {
+            qualifierValue = getQualifierValue(component);
+        }
+
+        return new ComponentConfig(processProvider(clazz, component), namedValue, qualifierValue);
     }
 
     private String getNamedValue(T component) {
@@ -48,6 +58,34 @@ public class Container<T> {
             return false;
         }
         return ((Class) component).isAnnotationPresent(Named.class);
+    }
+
+    private String getQualifierValue(T component) {
+        String QualifierValue = null;
+        for (Annotation annotation : ((Class) component).getAnnotations()) {
+            boolean anyMatch = Arrays.stream(annotation.annotationType().getAnnotations()).anyMatch(it -> it.annotationType().equals(Qualifier.class));
+            if (anyMatch) {
+                QualifierValue = annotation.toString();
+            }
+        }
+
+        return QualifierValue;
+    }
+
+    private boolean existQualifierValue(Class<T> clazz, T component) {
+        if (clazz.isInstance(component)) {
+            return false;
+        }
+
+        boolean isQualifier = false;
+        for (Annotation annotation : ((Class) component).getAnnotations()) {
+            boolean anyMatch = Arrays.stream(annotation.annotationType().getAnnotations()).anyMatch(it -> it.annotationType().equals(Qualifier.class));
+            if (anyMatch) {
+                isQualifier = true;
+            }
+        }
+
+        return isQualifier;
     }
 
     private Provider<T> processProvider(Class<T> clazz, T component) {
@@ -62,10 +100,7 @@ public class Container<T> {
                                                 .findAny().orElseGet(() -> {
                             try {
 
-                                Constructor temp = ((Class) component).getConstructor();
-                                System.out.println("this.is.temp");
-                                System.out.println(temp);
-                                return temp;
+                                return ((Class) component).getConstructor();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -97,17 +132,30 @@ public class Container<T> {
 
         String key = parameterType.toString();
         boolean isNamed = parameter.isAnnotationPresent(Named.class);
-        String namedValue = "";
+        String namedValue = null;
+
         if (isNamed) {
             namedValue = parameter.getAnnotation(Named.class).value();
-            key += namedValue;
+            key += namedValue + ";";
+        }
+
+
+        boolean isQualifier = false;
+        String QualifierValue = null;
+        for (Annotation annotation : parameter.getAnnotations()) {
+            boolean anyMatch = Arrays.stream(annotation.annotationType().getAnnotations()).anyMatch(it -> it.annotationType().equals(Qualifier.class));
+            if (anyMatch) {
+                isQualifier = true;
+                QualifierValue = annotation.toString();
+                key += QualifierValue + ";";
+            }
         }
 
         if (isSingleton && existInstances.containsKey(key)) {
             return existInstances.get(key);
         }
 
-        Object newInstance = isNamed ? this.get(parameterType, namedValue) : this.get(parameterType);
+        Object newInstance = isNamed || isQualifier ? this.get(parameterType, namedValue, QualifierValue) : this.get(parameterType);
 
         if (isSingleton) {
             existInstances.put(key, (T) newInstance);
@@ -115,12 +163,12 @@ public class Container<T> {
         return newInstance;
     }
 
-    private Object get(Class clazz, String namedValue) {
-        ComponentConfig componentConfig = existClasses.get(clazz).stream()
-                                                      .filter(it -> Objects.nonNull(it.getName()))
-                                                      .filter(it -> it.getName().equals(namedValue))
-                                                      .findAny().orElseThrow(RuntimeException::new);
-        return componentConfig.getProvider().get();
+    private Object get(Class clazz, String namedValue, String qualifierValue) {
+        Optional<ComponentConfig> componentConfig = existClasses.get(clazz).stream()
+                                                                .filter(it -> (Objects.nonNull(namedValue) && Objects.equals(it.getName(), namedValue))
+                                                                        || (Objects.nonNull(qualifierValue) && Objects.equals(it.getQualifierValue(), qualifierValue)))
+                                                                .findAny();
+        return componentConfig.get().getProvider().get();
     }
 
     public Object get(Class<T> clazz) {

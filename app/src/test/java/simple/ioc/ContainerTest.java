@@ -110,4 +110,17 @@ public class ContainerTest {
         assertSame("red", consumer.getRedComponent().getColor());
         assertSame("blue", consumer.getBlueComponent().getColor());
     }
+
+    @Test
+    public void should_inject_to_component_with_qualifier() {
+        Container container = new Container();
+
+        container.bind(SizeComponent.class, BigSizeComponent.class);
+        container.bind(SizeComponent.class, SmallSizeComponent.class);
+        container.bind(Consumer.class, ComponentConsumerWithQualifierParam.class);
+
+        ComponentConsumerWithQualifierParam consumer = (ComponentConsumerWithQualifierParam) container.get(Consumer.class);
+        assertSame("big", consumer.getBigSizeComponent().getSize());
+        assertSame("small", consumer.getSmallSizeComponent().getSize());
+    }
 }
