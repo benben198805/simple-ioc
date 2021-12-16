@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Container<T> {
     private final Map<Class<T>, List<ComponentConfig>> existClasses = new HashMap<>();
@@ -136,7 +134,7 @@ public class Container<T> {
 
         if (isNamed) {
             namedValue = parameter.getAnnotation(Named.class).value();
-            key += namedValue + ";";
+            key = "named:" + namedValue;
         }
 
 
@@ -147,7 +145,7 @@ public class Container<T> {
             if (anyMatch) {
                 isQualifier = true;
                 QualifierValue = annotation.toString();
-                key += QualifierValue + ";";
+                key = "qualifier:" + namedValue;
             }
         }
 
@@ -164,15 +162,15 @@ public class Container<T> {
     }
 
     private Object get(Class clazz, String namedValue, String qualifierValue) {
-        Optional<ComponentConfig> componentConfig = existClasses.get(clazz).stream()
-                                                                .filter(it -> (Objects.nonNull(namedValue) && Objects.equals(it.getName(), namedValue))
-                                                                        || (Objects.nonNull(qualifierValue) && Objects.equals(it.getQualifierValue(), qualifierValue)))
-                                                                .findAny();
-        return componentConfig.get().getProvider().get();
+        ComponentConfig componentConfig = existClasses.get(clazz).stream()
+                                                      .filter(it -> (Objects.nonNull(namedValue) && Objects.equals(it.getName(), namedValue))
+                                                              || (Objects.nonNull(qualifierValue) && Objects.equals(it.getQualifierValue(), qualifierValue)))
+                                                      .findAny().orElseThrow(RuntimeException::new);
+        return componentConfig.getProvider().get();
     }
 
     public Object get(Class<T> clazz) {
-        ComponentConfig componentConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getName())).collect(Collectors.toList()).stream().findAny().orElseThrow(RuntimeException::new);
+        ComponentConfig componentConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getName())).findAny().orElseThrow(RuntimeException::new);
         return componentConfig.getProvider().get();
     }
 
