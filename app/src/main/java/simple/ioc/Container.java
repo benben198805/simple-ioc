@@ -2,6 +2,7 @@ package simple.ioc;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Scope;
 import javax.inject.Singleton;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -55,13 +56,15 @@ public class Container<T> {
 
     private Object getComponentInstance(Parameter parameter, Class parameterType) {
         boolean hasSingleton = parameter.isAnnotationPresent(Singleton.class);
+        boolean hasScope = Arrays.stream(parameter.getDeclaredAnnotations()).anyMatch(it -> it.annotationType().isAnnotationPresent(Scope.class));
+        boolean isSingleton = hasSingleton || hasScope;
 
-        if (hasSingleton && existInstances.containsKey(parameterType)) {
+        if (isSingleton && existInstances.containsKey(parameterType)) {
             return existInstances.get(parameterType);
         }
 
         Object newInstance = this.get(parameterType);
-        if (hasSingleton) {
+        if (isSingleton) {
             existInstances.put(parameterType, (T) newInstance);
         }
         return newInstance;

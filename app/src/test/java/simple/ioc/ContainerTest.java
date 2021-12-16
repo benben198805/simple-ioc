@@ -55,7 +55,7 @@ public class ContainerTest {
         container.bind(Component.class, component);
         container.bind(Consumer.class, ComponentConsumerWithTwoConstructors.class);
 
-        assertSame(component, ((Consumer)container.get(Consumer.class)).getComponent());
+        assertSame(component, ((Consumer) container.get(Consumer.class)).getComponent());
     }
 
     @Test
@@ -81,6 +81,19 @@ public class ContainerTest {
 
         SingletonComponentConsumer componentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
         SingletonComponentConsumer otherComponentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
+
+        assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
+    }
+
+    @Test
+    public void should_inject_to_scope_component() {
+        Container container = new Container();
+
+        container.bind(Component.class, CustomComponent.class);
+        container.bind(ScopeComponentConsumer.class, ScopeComponentConsumer.class);
+
+        ScopeComponentConsumer componentConsumer = (ScopeComponentConsumer) container.get(ScopeComponentConsumer.class);
+        ScopeComponentConsumer otherComponentConsumer = (ScopeComponentConsumer) container.get(ScopeComponentConsumer.class);
 
         assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
     }
