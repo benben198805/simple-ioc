@@ -117,24 +117,15 @@ public class Container<T> {
 
     private Object get(Class clazz, String namedValue) {
         ComponentConfig componentConfig = existClasses.get(clazz).stream()
-                                                      .filter(it -> Objects.nonNull(it.name))
-                                                      .filter(it -> it.name.equals(namedValue))
+                                                      .filter(it -> Objects.nonNull(it.getName()))
+                                                      .filter(it -> it.getName().equals(namedValue))
                                                       .findAny().orElseThrow(RuntimeException::new);
-        return componentConfig.provider.get();
+        return componentConfig.getProvider().get();
     }
 
     public Object get(Class<T> clazz) {
-        ComponentConfig componentConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.name)).collect(Collectors.toList()).stream().findAny().orElseThrow(RuntimeException::new);
-        return componentConfig.provider.get();
+        ComponentConfig componentConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getName())).collect(Collectors.toList()).stream().findAny().orElseThrow(RuntimeException::new);
+        return componentConfig.getProvider().get();
     }
 
-    private class ComponentConfig {
-        private Provider<T> provider;
-        private String name;
-
-        public ComponentConfig(Provider<T> provider, String name) {
-            this.provider = provider;
-            this.name = name;
-        }
-    }
 }
