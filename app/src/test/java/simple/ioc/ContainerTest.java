@@ -43,4 +43,17 @@ public class ContainerTest {
 
         assertNotNull(container.get(ComponentWithDefaultConstructor.class));
     }
+
+    @Test
+    public void should_inject_to_annotated_constructor() {
+        Container container = new Container();
+
+        Component component = new Component() {
+        };
+
+        container.bind(Component.class, component);
+        container.bind(Consumer.class, ComponentConsumerWithTwoConstructors.class);
+
+        assertSame(component, ((Consumer)container.get(Consumer.class)).getComponent());
+    }
 }
