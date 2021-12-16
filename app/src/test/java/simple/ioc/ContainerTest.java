@@ -71,4 +71,17 @@ public class ContainerTest {
 
         assertNotSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
     }
+
+    @Test
+    public void should_inject_to_singleton_component() {
+        Container container = new Container();
+
+        container.bind(Component.class, CustomComponent.class);
+        container.bind(SingletonComponentConsumer.class, SingletonComponentConsumer.class);
+
+        SingletonComponentConsumer componentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
+        SingletonComponentConsumer otherComponentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
+
+        assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
+    }
 }
