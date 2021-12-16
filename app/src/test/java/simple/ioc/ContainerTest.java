@@ -18,4 +18,19 @@ public class ContainerTest {
         // then
         assertSame(component, container.get(Component.class));
     }
+
+    @Test
+    public void should_inject_dependencies_by_constructor() {
+        // given
+        Container container = new Container();
+        Component component = new Component() {
+        };
+
+        // when
+        container.bind(Component.class, component);
+        container.bind(Consumer.class, ComponentConsumer.class);
+
+        // then
+        assertSame(component, ((Consumer) container.get(Consumer.class)).getComponent());
+    }
 }
