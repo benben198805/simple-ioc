@@ -2,6 +2,7 @@ package simple.ioc;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ContainerTest {
@@ -32,5 +33,14 @@ public class ContainerTest {
 
         // then
         assertSame(component, ((Consumer) container.get(Consumer.class)).getComponent());
+    }
+
+    @Test
+    public void should_bind_type_to_specific_instance_with_default_constructor() {
+        Container container = new Container();
+
+        container.bind(ComponentWithDefaultConstructor.class, ComponentWithDefaultConstructor.class);
+
+        assertNotNull(container.get(ComponentWithDefaultConstructor.class));
     }
 }

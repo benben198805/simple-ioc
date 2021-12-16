@@ -23,7 +23,13 @@ public class Container<T> {
 
                 Constructor constructor = Arrays.stream(((Class) component).getConstructors())
                                                 .filter(it -> it.isAnnotationPresent(Inject.class))
-                                                .findAny().orElseGet(null);
+                                                .findAny().orElseGet(() -> {
+                            try {
+                                return ((Class) component).getConstructor();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                 Object[] params = Arrays.stream(constructor.getParameterTypes()).map(this::get).toArray();
                 return (T) constructor.newInstance(params);
             } catch (Exception e) {
