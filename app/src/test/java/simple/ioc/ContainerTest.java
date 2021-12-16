@@ -3,6 +3,7 @@ package simple.ioc;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ContainerTest {
@@ -55,5 +56,19 @@ public class ContainerTest {
         container.bind(Consumer.class, ComponentConsumerWithTwoConstructors.class);
 
         assertSame(component, ((Consumer)container.get(Consumer.class)).getComponent());
+    }
+
+    @Test
+    public void should_inject_to_component_instance_everytime() {
+        Container container = new Container();
+
+        container.bind(Component.class, CustomComponent.class);
+        container.bind(ComponentConsumer.class, ComponentConsumer.class);
+        container.bind(OtherComponentConsumer.class, OtherComponentConsumer.class);
+
+        ComponentConsumer componentConsumer = (ComponentConsumer) container.get(ComponentConsumer.class);
+        ComponentConsumer otherComponentConsumer = (ComponentConsumer) container.get(ComponentConsumer.class);
+
+        assertNotSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
     }
 }
