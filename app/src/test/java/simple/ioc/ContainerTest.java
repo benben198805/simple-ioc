@@ -97,4 +97,17 @@ public class ContainerTest {
 
         assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
     }
+
+    @Test
+    public void should_inject_to_component_with_name() {
+        Container container = new Container();
+
+        container.bind(ColorComponent.class, BlueComponent.class);
+        container.bind(ColorComponent.class, RedComponent.class);
+        container.bind(Consumer.class, ComponentConsumerWithNamedParam.class);
+
+        ComponentConsumerWithNamedParam consumer = (ComponentConsumerWithNamedParam) container.get(Consumer.class);
+        assertSame("red", consumer.getRedComponent().getColor());
+        assertSame("blue", consumer.getBlueComponent().getColor());
+    }
 }
