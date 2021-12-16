@@ -1,4 +1,6 @@
-package simple.ioc;
+package simple.ioc.component;
+
+import simple.ioc.annotation.SizeQualifier;
 
 import javax.inject.Named;
 

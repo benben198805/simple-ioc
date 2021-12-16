@@ -1,6 +1,23 @@
 package simple.ioc;
 
 import org.junit.jupiter.api.Test;
+import simple.ioc.component.BigSizeComponent;
+import simple.ioc.component.BlueComponent;
+import simple.ioc.component.ColorComponent;
+import simple.ioc.component.Component;
+import simple.ioc.component.ComponentWithDefaultConstructor;
+import simple.ioc.component.CustomComponent;
+import simple.ioc.component.RedComponent;
+import simple.ioc.component.SizeComponent;
+import simple.ioc.component.SmallSizeComponent;
+import simple.ioc.consumer.ComponentConsumer;
+import simple.ioc.consumer.ComponentConsumerWithNamedParam;
+import simple.ioc.consumer.ComponentConsumerWithQualifierParam;
+import simple.ioc.consumer.ComponentConsumerWithTwoConstructors;
+import simple.ioc.consumer.Consumer;
+import simple.ioc.consumer.OtherComponentConsumer;
+import simple.ioc.consumer.ScopeComponentConsumer;
+import simple.ioc.consumer.SingletonComponentConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;

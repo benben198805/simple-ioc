@@ -1,4 +1,8 @@
-package simple.ioc;
+package simple.ioc.consumer;
+
+import simple.ioc.component.SizeComponent;
+import simple.ioc.annotation.SizeQualifier;
+import simple.ioc.component.Component;
 
 import javax.inject.Inject;
 

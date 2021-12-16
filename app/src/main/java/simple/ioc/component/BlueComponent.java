@@ -1,4 +1,4 @@
-package simple.ioc;
+package simple.ioc.component;
 
 import javax.inject.Named;
 

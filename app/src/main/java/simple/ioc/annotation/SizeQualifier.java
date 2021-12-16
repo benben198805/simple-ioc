@@ -1,4 +1,4 @@
-package simple.ioc;
+package simple.ioc.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

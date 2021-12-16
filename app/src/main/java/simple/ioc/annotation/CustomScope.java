@@ -1,4 +1,4 @@
-package simple.ioc;
+package simple.ioc.annotation;
 
 import javax.inject.Scope;
 import java.lang.annotation.Documented;

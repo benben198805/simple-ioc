@@ -1,4 +1,6 @@
-package simple.ioc;
+package simple.ioc.consumer;
+
+import simple.ioc.component.Component;
 
 import javax.inject.Inject;
 
