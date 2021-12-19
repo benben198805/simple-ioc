@@ -78,11 +78,11 @@ class BeanConfigService<T> {
 
     private Object[] getParamInstances(Constructor constructor) {
         return Arrays.stream(constructor.getParameters())
-                     .map(parameter -> this.getParamInstance(parameter, parameter.getType()))
+                     .map(this::getParamInstance)
                      .toArray();
     }
 
-    private Object getParamInstance(Parameter parameter, Class parameterType) {
+    private Object getParamInstance(Parameter parameter) {
         boolean hasSingleton = parameter.isAnnotationPresent(Singleton.class);
         boolean hasScope = Arrays.stream(parameter.getDeclaredAnnotations())
                                  .anyMatch(it -> it.annotationType().isAnnotationPresent(Scope.class));
@@ -99,7 +99,7 @@ class BeanConfigService<T> {
                 .findAny().map(Annotation::toString)
                 .orElse(null);
 
-        String instanceKey = String.join(":", ImmutableList.of(parameterType.toString(),
+        String instanceKey = String.join(":", ImmutableList.of(parameter.getType().toString(),
                 String.valueOf(namedAnnotationValue),
                 String.valueOf(qualifierAnnotationValue)));
 
@@ -108,8 +108,8 @@ class BeanConfigService<T> {
         }
 
         Object paramInstance = Objects.nonNull(namedAnnotationValue) || Objects.nonNull(qualifierAnnotationValue) ?
-                this.container.get(parameterType, namedAnnotationValue, qualifierAnnotationValue) :
-                this.container.get(parameterType);
+                this.container.get(parameter.getType(), namedAnnotationValue, qualifierAnnotationValue) :
+                this.container.get(parameter.getType());
 
         if (isSingleton) {
             existInstances.put(instanceKey, (T) paramInstance);
