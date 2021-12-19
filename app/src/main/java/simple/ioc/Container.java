@@ -8,14 +8,14 @@ import java.util.Objects;
 
 public class Container<T> {
     private final Map<Class<T>, List<BeanConfig>> existClasses = new HashMap<>();
-    private final BeanConfigService componentConfigService;
+    private final BeanConfigService beanConfigService;
 
     public Container() {
-        this.componentConfigService = new BeanConfigService(this);
+        this.beanConfigService = new BeanConfigService(this);
     }
 
     public void bind(Class<T> clazz, T component) {
-        BeanConfig beanConfig = this.componentConfigService.generateBeanConfig(clazz, component);
+        BeanConfig beanConfig = this.beanConfigService.generateBeanConfig(clazz, component);
         existClasses.compute(clazz, (key, value) -> {
             if (Objects.isNull(value)) {
                 return new ArrayList<>() {{
