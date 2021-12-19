@@ -26,26 +26,7 @@ class BeanConfigService<T> {
     }
 
     public BeanConfig generateBeanConfig(Class<T> clazz, T component) {
-
-        String namedAnnotationValue = Optional.ofNullable(component)
-                                              .filter(it -> !clazz.isInstance(it))
-                                              .map(it -> (Named) ((Class) it).getAnnotation(Named.class))
-                                              .map(Named::value).orElse(null);
-
-        String qualifierAnnotationValue = getQualifierAnnotationValue(clazz, component);
-
-        return new BeanConfig(getBeanProvider(clazz, component), namedAnnotationValue, qualifierAnnotationValue);
-    }
-
-    private String getQualifierAnnotationValue(Class<T> clazz, T component) {
-        if (clazz.isInstance(component)) {
-            return null;
-        }
-
-        return Arrays.stream(((Class) component).getAnnotations())
-                     .filter(annotation -> Arrays.stream(annotation.annotationType().getAnnotations())
-                                                 .anyMatch(it -> it.annotationType().equals(Qualifier.class)))
-                     .map(Annotation::toString).findAny().orElse(null);
+        return new BeanConfig(getBeanProvider(clazz, component), clazz, component);
     }
 
     private Provider<T> getBeanProvider(Class<T> clazz, T component) {
