@@ -13,8 +13,8 @@ class BeanConfig<T> {
         this.qualifierValue = qualifierValue;
     }
 
-    public Provider<T> getBeanProvider() {
-        return beanProvider;
+    public Object getBean() {
+        return this.beanProvider.get();
     }
 
     public String getNamedValue() {

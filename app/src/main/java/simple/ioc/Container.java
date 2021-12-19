@@ -30,15 +30,15 @@ public class Container<T> {
 
     public Object get(Class clazz, String namedValue, String qualifierValue) {
         BeanConfig beanConfig = existClasses.get(clazz).stream()
-                                                 .filter(it -> matchBeanConfigByNamedAndQualifier(it, namedValue, qualifierValue))
-                                                 .findAny().orElseThrow(RuntimeException::new);
-        return beanConfig.getBeanProvider().get();
+                                            .filter(it -> matchBeanConfigByNamedAndQualifier(it, namedValue, qualifierValue))
+                                            .findAny().orElseThrow(RuntimeException::new);
+        return beanConfig.getBean();
     }
 
     public Object get(Class<T> clazz) {
         BeanConfig beanConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getNamedValue()))
-                                                 .findAny().orElseThrow(RuntimeException::new);
-        return beanConfig.getBeanProvider().get();
+                                            .findAny().orElseThrow(RuntimeException::new);
+        return beanConfig.getBean();
     }
 
     private boolean matchBeanConfigByNamedAndQualifier(BeanConfig beanConfig, String namedValue, String qualifierValue) {
