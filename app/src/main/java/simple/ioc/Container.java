@@ -28,7 +28,7 @@ public class Container<T> {
 
     public Object get(Class clazz, String namedValue, String qualifierValue) {
         BeanConfig beanConfig = existClasses.get(clazz).stream()
-                                            .filter(it -> it.getMatchedBeanConfig(namedValue, qualifierValue))
+                                            .filter(it -> it.filterBeanConfigByAnnotationValue(namedValue, qualifierValue))
                                             .findAny().orElseThrow(RuntimeException::new);
         return beanConfig.getBean();
     }

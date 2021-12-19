@@ -45,7 +45,7 @@ class BeanConfig<T> {
         return this.beanProvider.get();
     }
 
-    public boolean getMatchedBeanConfig(String namedValue, String qualifierValue) {
+    public boolean filterBeanConfigByAnnotationValue(String namedValue, String qualifierValue) {
         boolean matchNamedValue = Objects.nonNull(namedValue) && Objects.equals(this.namedAnnotationValue, namedValue);
         boolean matchQualifierValue = Objects.nonNull(qualifierValue) && Objects.equals(this.qualifierAnnotationValue, qualifierValue);
         return matchNamedValue || matchQualifierValue;
