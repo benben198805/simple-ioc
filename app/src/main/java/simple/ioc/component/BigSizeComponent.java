@@ -4,7 +4,6 @@ import simple.ioc.annotation.SizeQualifier;
 
 import javax.inject.Named;
 
-@Named
 @SizeQualifier(value = "big")
 public class BigSizeComponent implements SizeComponent {
     public BigSizeComponent() {

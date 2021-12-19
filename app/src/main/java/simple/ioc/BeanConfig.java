@@ -4,12 +4,12 @@ import javax.inject.Provider;
 
 class BeanConfig<T> {
     private Provider<T> beanProvider;
-    private String name;
+    private String namedValue;
     private String qualifierValue;
 
     public BeanConfig(Provider<T> beanProvider, String name, String qualifierValue) {
         this.beanProvider = beanProvider;
-        this.name = name;
+        this.namedValue = name;
         this.qualifierValue = qualifierValue;
     }
 
@@ -17,8 +17,8 @@ class BeanConfig<T> {
         return beanProvider;
     }
 
-    public String getName() {
-        return name;
+    public String getNamedValue() {
+        return namedValue;
     }
 
     public String getQualifierValue() {

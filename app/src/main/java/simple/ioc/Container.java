@@ -36,13 +36,13 @@ public class Container<T> {
     }
 
     public Object get(Class<T> clazz) {
-        BeanConfig beanConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getName()))
+        BeanConfig beanConfig = existClasses.get(clazz).stream().filter(it -> Objects.isNull(it.getNamedValue()))
                                                  .findAny().orElseThrow(RuntimeException::new);
         return beanConfig.getBeanProvider().get();
     }
 
     private boolean matchBeanConfigByNamedAndQualifier(BeanConfig beanConfig, String namedValue, String qualifierValue) {
-        boolean matchNamedValue = Objects.nonNull(namedValue) && Objects.equals(beanConfig.getName(), namedValue);
+        boolean matchNamedValue = Objects.nonNull(namedValue) && Objects.equals(beanConfig.getNamedValue(), namedValue);
         boolean matchQualifierValue = Objects.nonNull(qualifierValue) && Objects.equals(beanConfig.getQualifierValue(), qualifierValue);
         return matchNamedValue || matchQualifierValue;
     }

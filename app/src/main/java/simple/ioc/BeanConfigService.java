@@ -32,36 +32,20 @@ class BeanConfigService<T> {
                                               .map(it -> (Named) ((Class) it).getAnnotation(Named.class))
                                               .map(Named::value).orElse(null);
 
-        String qualifierAnnotationValue = null;
-        if (existQualifierAnnotation(clazz, component)) {
-            qualifierAnnotationValue = getQualifierAnnotationValue(component);
-        }
+        String qualifierAnnotationValue = getQualifierAnnotationValue(clazz, component);
 
         return new BeanConfig(getBeanProvider(clazz, component), namedAnnotationValue, qualifierAnnotationValue);
     }
 
-    private String getQualifierAnnotationValue(T component) {
-        String QualifierValue = null;
-        for (Annotation annotation : ((Class) component).getAnnotations()) {
-            boolean anyMatch = Arrays.stream(annotation.annotationType().getAnnotations())
-                                     .anyMatch(it -> it.annotationType().equals(Qualifier.class));
-            if (anyMatch) {
-                QualifierValue = annotation.toString();
-            }
-        }
-
-        return QualifierValue;
-    }
-
-    private boolean existQualifierAnnotation(Class<T> clazz, T component) {
+    private String getQualifierAnnotationValue(Class<T> clazz, T component) {
         if (clazz.isInstance(component)) {
-            return false;
+            return null;
         }
 
         return Arrays.stream(((Class) component).getAnnotations())
-                     .anyMatch(annotation ->
-                             Arrays.stream(annotation.annotationType().getAnnotations())
-                                   .anyMatch(it -> it.annotationType().equals(Qualifier.class)));
+                     .filter(annotation -> Arrays.stream(annotation.annotationType().getAnnotations())
+                                                 .anyMatch(it -> it.annotationType().equals(Qualifier.class)))
+                     .map(Annotation::toString).findAny().orElse(null);
     }
 
     private Provider<T> getBeanProvider(Class<T> clazz, T component) {
@@ -108,14 +92,12 @@ class BeanConfigService<T> {
                                               .map(it -> it.getAnnotation(Named.class))
                                               .map(Named::value).orElse(null);
 
-        String qualifierAnnotationValue = null;
-        for (Annotation annotation : parameter.getAnnotations()) {
-            boolean anyMatch = Arrays.stream(annotation.annotationType().getAnnotations())
-                                     .anyMatch(it -> it.annotationType().equals(Qualifier.class));
-            if (anyMatch) {
-                qualifierAnnotationValue = annotation.toString();
-            }
-        }
+        String qualifierAnnotationValue = Arrays
+                .stream(parameter.getAnnotations())
+                .filter(annotation -> Arrays.stream(annotation.annotationType().getAnnotations())
+                                            .anyMatch(it -> it.annotationType().equals(Qualifier.class)))
+                .findAny().map(Annotation::toString)
+                .orElse(null);
 
         String instanceKey = String.join(":", ImmutableList.of(parameterType.toString(),
                 String.valueOf(namedAnnotationValue),
