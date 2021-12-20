@@ -7,11 +7,13 @@ import simple.ioc.component.ColorComponent;
 import simple.ioc.component.Component;
 import simple.ioc.component.ComponentWithDefaultConstructor;
 import simple.ioc.component.CustomComponent;
-import simple.ioc.component.ScopeComponent;
 import simple.ioc.component.RedComponent;
+import simple.ioc.component.ScopeComponent;
 import simple.ioc.component.SingletonComponent;
 import simple.ioc.component.SizeComponent;
 import simple.ioc.component.SmallSizeComponent;
+import simple.ioc.consumer.CircularDependenciesAConsumer;
+import simple.ioc.consumer.CircularDependenciesBConsumer;
 import simple.ioc.consumer.ComponentConsumer;
 import simple.ioc.consumer.ComponentConsumerWithNamedParam;
 import simple.ioc.consumer.ComponentConsumerWithQualifierParam;
@@ -20,10 +22,12 @@ import simple.ioc.consumer.Consumer;
 import simple.ioc.consumer.OtherComponentConsumer;
 import simple.ioc.consumer.ScopeComponentConsumer;
 import simple.ioc.consumer.SingletonComponentConsumer;
+import simple.ioc.exception.CircularDependenciesException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ContainerTest {
 
@@ -152,5 +156,19 @@ public class ContainerTest {
         ComponentConsumerWithQualifierParam consumer = (ComponentConsumerWithQualifierParam) container.get(Consumer.class);
         assertSame("big", consumer.getBigSizeComponent().getSize());
         assertSame("small", consumer.getSmallSizeComponent().getSize());
+    }
+
+    @Test
+    public void should_throw_exception_when_circular_dependencies() {
+        Container container = new Container();
+
+        container.bind(CircularDependenciesAConsumer.class, CircularDependenciesAConsumer.class);
+        container.bind(CircularDependenciesBConsumer.class, CircularDependenciesBConsumer.class);
+
+        assertThrows(CircularDependenciesException.class, () -> {
+            CircularDependenciesAConsumer consumer =
+                    (CircularDependenciesAConsumer) container.get(CircularDependenciesAConsumer.class);
+            consumer.getConsumer();
+        });
     }
 }

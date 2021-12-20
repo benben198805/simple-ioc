@@ -1,5 +1,7 @@
 package simple.ioc;
 
+import simple.ioc.exception.CircularDependenciesException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +32,20 @@ public class Container<T> {
         BeanConfig beanConfig = existClasses.get(clazz).stream()
                                             .filter(it -> it.filterBeanConfigByAnnotationValue(namedValue, qualifierValue))
                                             .findAny().orElseThrow(RuntimeException::new);
-        return beanConfig.getBean();
+        return getBean(beanConfig);
     }
 
     public Object get(Class<T> clazz) {
         BeanConfig beanConfig = existClasses.get(clazz).stream()
                                             .findAny().orElseThrow(RuntimeException::new);
-        return beanConfig.getBean();
+        return getBean(beanConfig);
+    }
+
+    private Object getBean(BeanConfig beanConfig) {
+        try {
+            return beanConfig.getBean();
+        } catch (StackOverflowError error) {
+            throw new CircularDependenciesException("error");
+        }
     }
 }
