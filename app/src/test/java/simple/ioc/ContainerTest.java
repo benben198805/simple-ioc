@@ -7,6 +7,7 @@ import simple.ioc.component.ColorComponent;
 import simple.ioc.component.Component;
 import simple.ioc.component.ComponentWithDefaultConstructor;
 import simple.ioc.component.CustomComponent;
+import simple.ioc.component.ScopeComponent;
 import simple.ioc.component.RedComponent;
 import simple.ioc.component.SingletonComponent;
 import simple.ioc.component.SizeComponent;
@@ -111,13 +112,17 @@ public class ContainerTest {
     public void should_inject_to_scope_component() {
         Container container = new Container();
 
-        container.bind(Component.class, CustomComponent.class);
+        container.bind(ScopeComponent.class, ScopeComponent.class);
         container.bind(ScopeComponentConsumer.class, ScopeComponentConsumer.class);
 
         ScopeComponentConsumer componentConsumer = (ScopeComponentConsumer) container.get(ScopeComponentConsumer.class);
         ScopeComponentConsumer otherComponentConsumer = (ScopeComponentConsumer) container.get(ScopeComponentConsumer.class);
 
-        assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
+        ScopeComponent componentA = (ScopeComponent) componentConsumer.getComponent();
+        ScopeComponent componentB = (ScopeComponent) otherComponentConsumer.getComponent();
+        assertSame(componentA, componentB);
+        componentA.setValue("abc");
+        assertSame("abc", componentB.getValue());
     }
 
     @Test
