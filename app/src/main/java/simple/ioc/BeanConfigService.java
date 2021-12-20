@@ -91,11 +91,8 @@ class BeanConfigService<T> {
 
     private boolean isSingleton(T component) {
         boolean hasSingleton = ((Class) component).isAnnotationPresent(Singleton.class);
-        System.out.println(component);
-        System.out.println(hasSingleton);
         boolean hasScope = Arrays.stream(((Class) component).getDeclaredAnnotations())
                                  .anyMatch(it -> it.annotationType().isAnnotationPresent(Scope.class));
-        System.out.println(hasScope);
         boolean isSingleton = hasSingleton || hasScope;
         return isSingleton;
     }
