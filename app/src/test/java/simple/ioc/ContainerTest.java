@@ -26,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class ContainerTest {
+
+    private static final String TEST_VALUE = "test_value_abc";
+
     @Test
     public void should_bind_class_to_special_instance() {
         // given
@@ -104,8 +107,8 @@ public class ContainerTest {
         SingletonComponent componentA = (SingletonComponent) componentConsumer.getComponent();
         SingletonComponent componentB = (SingletonComponent) otherComponentConsumer.getComponent();
         assertSame(componentA, componentB);
-        componentA.setValue("abc");
-        assertSame("abc", componentB.getValue());
+        componentA.setValue(TEST_VALUE);
+        assertSame(TEST_VALUE, componentB.getValue());
     }
 
     @Test
@@ -121,8 +124,8 @@ public class ContainerTest {
         ScopeComponent componentA = (ScopeComponent) componentConsumer.getComponent();
         ScopeComponent componentB = (ScopeComponent) otherComponentConsumer.getComponent();
         assertSame(componentA, componentB);
-        componentA.setValue("abc");
-        assertSame("abc", componentB.getValue());
+        componentA.setValue(TEST_VALUE);
+        assertSame(TEST_VALUE, componentB.getValue());
     }
 
     @Test
