@@ -8,6 +8,7 @@ import simple.ioc.component.Component;
 import simple.ioc.component.ComponentWithDefaultConstructor;
 import simple.ioc.component.CustomComponent;
 import simple.ioc.component.RedComponent;
+import simple.ioc.component.SingletonComponent;
 import simple.ioc.component.SizeComponent;
 import simple.ioc.component.SmallSizeComponent;
 import simple.ioc.consumer.ComponentConsumer;
@@ -93,13 +94,17 @@ public class ContainerTest {
     public void should_inject_to_singleton_component() {
         Container container = new Container();
 
-        container.bind(Component.class, CustomComponent.class);
+        container.bind(SingletonComponent.class, SingletonComponent.class);
         container.bind(SingletonComponentConsumer.class, SingletonComponentConsumer.class);
 
         SingletonComponentConsumer componentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
         SingletonComponentConsumer otherComponentConsumer = (SingletonComponentConsumer) container.get(SingletonComponentConsumer.class);
 
-        assertSame(componentConsumer.getComponent(), otherComponentConsumer.getComponent());
+        SingletonComponent componentA = (SingletonComponent) componentConsumer.getComponent();
+        SingletonComponent componentB = (SingletonComponent) otherComponentConsumer.getComponent();
+        assertSame(componentA, componentB);
+        componentA.setValue("abc");
+        assertSame("abc", componentB.getValue());
     }
 
     @Test

@@ -1,7 +1,5 @@
 package simple.ioc;
 
-import com.google.common.collect.ImmutableList;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -18,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 class BeanConfigService<T> {
-    private final Map<String, T> existInstances = new HashMap<>();
+    private final Map<T, T> existInstances = new HashMap<>();
     private Container container;
 
     public BeanConfigService(Container container) {
@@ -36,9 +34,20 @@ class BeanConfigService<T> {
                     return component;
                 }
 
+                boolean isSingleton = isSingleton(component);
+                if (isSingleton && existInstances.containsKey(component)) {
+                    return existInstances.get(component);
+                }
+
                 Constructor constructor = getConstructor((Class) component);
                 Object[] paramInstances = this.getParamInstances(constructor);
-                return (T) constructor.newInstance(paramInstances);
+                T instance = (T) constructor.newInstance(paramInstances);
+
+                if (isSingleton && !existInstances.containsKey(component)) {
+                    existInstances.put(component, instance);
+                }
+
+                return instance;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -64,11 +73,6 @@ class BeanConfigService<T> {
     }
 
     private Object getParamInstance(Parameter parameter) {
-        boolean hasSingleton = parameter.isAnnotationPresent(Singleton.class);
-        boolean hasScope = Arrays.stream(parameter.getDeclaredAnnotations())
-                                 .anyMatch(it -> it.annotationType().isAnnotationPresent(Scope.class));
-        boolean isSingleton = hasSingleton || hasScope;
-
         String namedAnnotationValue = Optional.of(parameter)
                                               .map(it -> it.getAnnotation(Named.class))
                                               .map(Named::value).orElse(null);
@@ -80,21 +84,16 @@ class BeanConfigService<T> {
                 .findAny().map(Annotation::toString)
                 .orElse(null);
 
-        String instanceKey = String.join(":", ImmutableList.of(parameter.getType().toString(),
-                String.valueOf(namedAnnotationValue),
-                String.valueOf(qualifierAnnotationValue)));
-
-        if (isSingleton && existInstances.containsKey(instanceKey)) {
-            return existInstances.get(instanceKey);
-        }
-
-        Object paramInstance = Objects.nonNull(namedAnnotationValue) || Objects.nonNull(qualifierAnnotationValue) ?
+        return Objects.nonNull(namedAnnotationValue) || Objects.nonNull(qualifierAnnotationValue) ?
                 this.container.get(parameter.getType(), namedAnnotationValue, qualifierAnnotationValue) :
                 this.container.get(parameter.getType());
+    }
 
-        if (isSingleton) {
-            existInstances.put(instanceKey, (T) paramInstance);
-        }
-        return paramInstance;
+    private boolean isSingleton(T component) {
+        boolean hasSingleton = ((Class) component).isAnnotationPresent(Singleton.class);
+        boolean hasScope = Arrays.stream(((Class) component).getDeclaredAnnotations())
+                                 .anyMatch(it -> it.annotationType().isAnnotationPresent(Scope.class));
+        boolean isSingleton = hasSingleton || hasScope;
+        return isSingleton;
     }
 }

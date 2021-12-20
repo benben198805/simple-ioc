@@ -2,8 +2,6 @@ package simple.ioc.component;
 
 import simple.ioc.annotation.SizeQualifier;
 
-import javax.inject.Named;
-
 @SizeQualifier(value = "small")
 public class SmallSizeComponent implements SizeComponent {
     public SmallSizeComponent() {
