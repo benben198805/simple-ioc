@@ -162,13 +162,13 @@ public class ContainerTest {
     public void should_throw_exception_when_circular_dependencies() {
         Container container = new Container();
 
-        container.bind(CircularDependenciesAConsumer.class, CircularDependenciesAConsumer.class);
-        container.bind(CircularDependenciesBConsumer.class, CircularDependenciesBConsumer.class);
+        container.bind(ProviderConsumer.class, ProviderConsumer.class);
+        container.bind(Component.class, Component.class);
 
         assertThrows(CircularDependenciesException.class, () -> {
-            CircularDependenciesAConsumer consumer =
-                    (CircularDependenciesAConsumer) container.get(CircularDependenciesAConsumer.class);
-            consumer.getConsumer();
+            ProviderConsumer consumer =
+                    (ProviderConsumer) container.get(ProviderConsumer.class);
+            consumer.getComponent();
         });
     }
 }
